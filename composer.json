@@ -1,0 +1,19 @@
+{
+	"name": "markguinn/silverstripe-shop-groupedproducts",
+	"description": "Grouped products for Silverstripe Shop module",
+	"type": "silverstripe-module",
+	"keywords": ["silverstripe", "ecommerce", "shop", "composite products", "grouped products"],
+	"license": "MIT",
+	"authors": [{
+		"name": "Mark Guinn",
+		"email": "mark@adaircreative.com",
+		"homepage": "http://github.com/markguinn"
+	}],
+	"extra": {
+		"installer-name": "shop_groupedproducts"
+	},
+	"require": {
+		"silverstripe/framework": "~3.1",
+		"burnbright/silverstripe-shop": "*"
+	}
+}
