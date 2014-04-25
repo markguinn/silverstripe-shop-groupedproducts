@@ -32,5 +32,12 @@ class GroupedProduct extends Product
 
 class GroupedProduct_Controller extends Product_Controller
 {
+	private static $allowed_actions = array('GroupedForm');
 
+	/**
+	 * @return GroupedCartForm
+	 */
+	public function GroupedForm() {
+		return new GroupedCartForm($this, 'GroupedForm', $this->dataRecord);
+	}
 }
