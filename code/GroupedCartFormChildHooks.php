@@ -28,8 +28,12 @@ class GroupedCartFormChildHooks extends DataExtension
 
 		foreach ($attributes as $attribute) {
 			$field = $attribute->getDropDownField(null, $this->owner->possibleValuesForAttributeType($attribute));
-			$field->setName("Product[{$this->owner->ID}][Attributes][$attribute->ID]");
-			$out[] = $field;
+			if ($field) {
+				$field->setName("Product[{$this->owner->ID}][Attributes][$attribute->ID]");
+				$out[] = $field;
+			} else {
+				$out[] = new LiteralField('empty'.$attribute->ID, '');
+			}
 		}
 
 //		if(self::$include_json){ //TODO: this should be included as js validation instead
