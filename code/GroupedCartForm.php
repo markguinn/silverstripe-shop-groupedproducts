@@ -31,8 +31,13 @@ class GroupedCartForm extends Form
 		}
 
 		$actions = new FieldList(array(
-			FormAction::create('addtocart', _t('GroupedCartForm.ADD', 'Add'))
+			FormAction::create('addtocart', _t('GroupedCartForm.ADD', 'Add to Cart'))
 		));
+
+		// integrate with wishlist module
+		if (class_exists('WishList')) {
+			$actions->unshift(FormAction::create('addtowishlist', _t('GroupedCartForm.ADDTOWISHLIST', 'Add to Wish List')));
+		}
 
 		parent::__construct($controller, $name, $fields, $actions);
 	}
@@ -76,5 +81,42 @@ class GroupedCartForm extends Form
 		}
 
 		ShoppingCart_Controller::direct($cart->getMessageType());
+	}
+
+
+	/**
+	 * @param array $data
+	 */
+	public function addtowishlist(array $data) {
+		if (!class_exists('WishList')) user_error('Wish List module not installed.');
+
+		if (empty($data) || empty($data['Product']) || !is_array($data['Product'])) {
+			$this->sessionMessage(_t('GroupedCartForm.EMPTY', 'Please select at least one product.'), 'bad');
+			$this->controller->redirectBack();
+			return;
+		}
+
+		$list = WishList::current();
+
+		foreach ($data['Product'] as $id => $prodReq) {
+			if (!empty($prodReq['Quantity']) && $prodReq['Quantity'] > 0) {
+				$prod = Product::get()->byID($id);
+				if ($prod && $prod->exists()) {
+					$buyable = $prod;
+
+					if (isset($prodReq['Attributes'])) {
+						$buyable = $prod->getVariationByAttributes($prodReq['Attributes']);
+						if (!$buyable || !$buyable->exists()) {
+							$this->sessionMessage("{$prod->InternalItemID} is not available with the selected options.", "bad");
+							return;
+						}
+					}
+
+					$list->addBuyable($buyable);
+				}
+			}
+		}
+
+		$this->controller->redirect( WishListPage::inst()->Link() );
 	}
 }
