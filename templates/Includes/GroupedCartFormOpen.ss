@@ -1,6 +1,6 @@
 <% with $GroupedForm %>
 	<% if $IncludeFormTag %>
-		<form $AttributesHTML>
+		<form data-target="ajax" $AttributesHTML>
 	<% end_if %>
 	<% if $Message %>
 			<p id="{$FormName}_error" class="message $MessageType">$Message</p>

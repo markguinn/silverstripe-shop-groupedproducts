@@ -1,0 +1,6 @@
+---
+Name: groupedproductsajax
+---
+GroupedCartForm:
+  extensions:
+    - GroupedCartFormAjax

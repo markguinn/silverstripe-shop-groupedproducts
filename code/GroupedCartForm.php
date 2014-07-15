@@ -46,12 +46,15 @@ class GroupedCartForm extends Form
 	/**
 	 * Handles form submission
 	 * @param array $data
+	 * @return bool|\SS_HTTPResponse
 	 */
 	public function addtocart(array $data) {
+		$groupedProduct = $this->getController()->data();
+
 		if (empty($data) || empty($data['Product']) || !is_array($data['Product'])) {
 			$this->sessionMessage(_t('GroupedCartForm.EMPTY', 'Please select at least one product.'), 'bad');
-			$this->controller->redirectBack();
-			return;
+			$this->extend('updateErrorResponse', $this->request, $response, $groupedProduct, $data, $this);
+			return $response ? $response : $this->controller->redirectBack();
 		}
 
 		$cart = ShoppingCart::singleton();
@@ -67,20 +70,22 @@ class GroupedCartForm extends Form
 						$buyable = $prod->getVariationByAttributes($prodReq['Attributes']);
 						if (!$buyable || !$buyable->exists()) {
 							$this->sessionMessage("{$prod->InternalItemID} is not available with the selected options.", "bad");
-							return;
+							$this->extend('updateErrorResponse', $this->request, $response, $groupedProduct, $data, $this);
+							return $response ? $response : $this->controller->redirectBack();
 						}
 					}
 
 					if (!$cart->add($buyable, (int)$prodReq['Quantity'], $saveabledata)) {
 						$this->sessionMessage($cart->getMessage(),$cart->getMessageType());
-						$this->controller->redirectBack();
-						return;
+						$this->extend('updateErrorResponse', $this->request, $response, $groupedProduct, $data, $this);
+						return $response ? $response : $this->controller->redirectBack();
 					}
 				}
 			}
 		}
 
-		ShoppingCart_Controller::direct($cart->getMessageType());
+		$this->extend('updateGroupCartResponse', $this->request, $response, $groupedProduct, $data, $this);
+		return $response ? $response : ShoppingCart_Controller::direct($cart->getMessageType());
 	}
 
 
@@ -89,11 +94,12 @@ class GroupedCartForm extends Form
 	 */
 	public function addtowishlist(array $data) {
 		if (!class_exists('WishList')) user_error('Wish List module not installed.');
+		$groupedProduct = $this->getController()->data();
 
 		if (empty($data) || empty($data['Product']) || !is_array($data['Product'])) {
 			$this->sessionMessage(_t('GroupedCartForm.EMPTY', 'Please select at least one product.'), 'bad');
-			$this->controller->redirectBack();
-			return;
+			$this->extend('updateErrorResponse', $this->request, $response, $groupedProduct, $data, $this);
+			return $response ? $response : $this->controller->redirectBack();
 		}
 
 		$list = WishList::current();
@@ -108,7 +114,8 @@ class GroupedCartForm extends Form
 						$buyable = $prod->getVariationByAttributes($prodReq['Attributes']);
 						if (!$buyable || !$buyable->exists()) {
 							$this->sessionMessage("{$prod->InternalItemID} is not available with the selected options.", "bad");
-							return;
+							$this->extend('updateErrorResponse', $this->request, $response, $groupedProduct, $data, $this);
+							return $response ? $response : $this->controller->redirectBack();
 						}
 					}
 
@@ -117,6 +124,7 @@ class GroupedCartForm extends Form
 			}
 		}
 
-		$this->controller->redirect( WishListPage::inst()->Link() );
+		$this->extend('updateGroupWishListResponse', $this->request, $response, $groupedProduct, $data, $this);
+		return $response ? $response : $this->controller->redirect( WishListPage::inst()->Link() );
 	}
 }
