@@ -8,12 +8,15 @@
  */
 class GroupedCartFormChildHooks extends DataExtension
 {
+	private static $quantity_field_type = 'number';
+
 	/**
 	 * @param String $label
 	 * @return NumericField
 	 */
 	public function getQuantityField($label = '') {
 		$f = new NumericField("Product[{$this->owner->ID}][Quantity]", $label);
+		$f->setAttribute('type', Config::inst()->get('GroupedCartFormChildHooks', 'quantity_field_type'));
 		$f->addExtraClass('grouped-quantity');
 		return $f;
 	}
