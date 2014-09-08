@@ -18,8 +18,7 @@ class GroupedCartFormAjax extends Extension
 	public function updateGroupCartResponse(&$request, &$response, $groupedProduct, $data, $form=null) {
 		if ($request->isAjax() && $this->owner->getController()->hasExtension('AjaxControllerExtension')) {
 			if (!$response) $response = $this->owner->getController()->getAjaxResponse();
-			$response->addRenderContext('PRODUCT', $groupedProduct);
-			$response->addRenderContext('FORM', $form);
+			$this->setupRenderContexts($response, $groupedProduct, $form);
 			$response->pushRegion('SideCart', $this->owner->getController());
 			$response->triggerEvent('cartadd');
 			$response->triggerEvent('cartchange', array('action' => 'add'));
@@ -37,8 +36,7 @@ class GroupedCartFormAjax extends Extension
 	public function updateGroupWishListResponse(&$request, &$response, $groupedProduct, $data, $form=null) {
 		if ($request->isAjax() && $this->owner->getController()->hasExtension('AjaxControllerExtension')) {
 			if (!$response) $response = $this->owner->getController()->getAjaxResponse();
-			$response->addRenderContext('PRODUCT', $groupedProduct);
-			$response->addRenderContext('FORM', $form);
+			$this->setupRenderContexts($response, $groupedProduct, $form);
 			$response->triggerEvent('wishlistadd');
 			$response->triggerEvent('wishlistchange', array('action' => 'add'));
 
@@ -71,5 +69,25 @@ class GroupedCartFormAjax extends Extension
 
 			$form->clearMessage();
 		}
+	}
+
+
+	/**
+	 * Adds some standard render contexts for pulled regions.
+	 *
+	 * @param AjaxHTTPResponse $response
+	 * @param GroupedProduct $groupedProduct
+	 * @param Form $form
+	 */
+	protected function setupRenderContexts(AjaxHTTPResponse $response, $groupedProduct, $form) {
+		if ($this->owner->getController()->hasMethod('Cart')) {
+			$cart = $this->owner->getController()->Cart();
+			if ($cart instanceof ViewableData) {
+				$response->addRenderContext('CART', $this->owner->getController()->Cart());
+			}
+		}
+
+		$response->addRenderContext('PRODUCT', $groupedProduct);
+		$response->addRenderContext('FORM', $form);
 	}
 }
