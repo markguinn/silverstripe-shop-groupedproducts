@@ -19,6 +19,15 @@ class GroupedCartFormAjax extends Extension
 		if ($request->isAjax() && $this->owner->getController()->hasExtension('AjaxControllerExtension')) {
 			if (!$response) $response = $this->owner->getController()->getAjaxResponse();
 			$this->setupRenderContexts($response, $groupedProduct, $form);
+
+			// Because ShoppingCart::current() calculates the order once and
+			// then remembers the total, and that was called BEFORE the product
+			// was added, we need to recalculate again here. Under non-ajax
+			// requests the redirect eliminates the need for this but under
+			// ajax the total lags behind the subtotal without this.
+			$order = ShoppingCart::curr();
+			$order->calculate();
+
 			$response->pushRegion('SideCart', $this->owner->getController());
 			$response->triggerEvent('cartadd');
 			$response->triggerEvent('cartchange', array('action' => 'add'));
