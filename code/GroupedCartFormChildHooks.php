@@ -8,37 +8,39 @@
  */
 class GroupedCartFormChildHooks extends DataExtension
 {
-	private static $quantity_field_type = 'number';
+    private static $quantity_field_type = 'number';
 
-	/**
-	 * @param String $label
-	 * @return NumericField
-	 */
-	public function getQuantityField($label = '') {
-		$f = new NumericField("Product[{$this->owner->ID}][Quantity]", $label);
-		$f->setAttribute('type', Config::inst()->get('GroupedCartFormChildHooks', 'quantity_field_type'));
-		$f->setAttribute('min', '0');
-		$f->addExtraClass('grouped-quantity');
-		return $f;
-	}
+    /**
+     * @param String $label
+     * @return NumericField
+     */
+    public function getQuantityField($label = '')
+    {
+        $f = new NumericField("Product[{$this->owner->ID}][Quantity]", $label);
+        $f->setAttribute('type', Config::inst()->get('GroupedCartFormChildHooks', 'quantity_field_type'));
+        $f->setAttribute('min', '0');
+        $f->addExtraClass('grouped-quantity');
+        return $f;
+    }
 
 
-	/**
-	 * @return ArrayList
-	 */
-	public function getVariationFields() {
-		$out = array();
-		$attributes = $this->owner->VariationAttributeTypes()->sort('Label');
+    /**
+     * @return ArrayList
+     */
+    public function getVariationFields()
+    {
+        $out = array();
+        $attributes = $this->owner->VariationAttributeTypes()->sort('Label');
 
-		foreach ($attributes as $attribute) {
-			$field = $attribute->getDropDownField(null, $this->owner->possibleValuesForAttributeType($attribute));
-			if ($field) {
-				$field->setName("Product[{$this->owner->ID}][Attributes][$attribute->ID]");
-				$out[] = $field;
-			} else {
-				$out[] = new LiteralField('empty'.$attribute->ID, '');
-			}
-		}
+        foreach ($attributes as $attribute) {
+            $field = $attribute->getDropDownField(null, $this->owner->possibleValuesForAttributeType($attribute));
+            if ($field) {
+                $field->setName("Product[{$this->owner->ID}][Attributes][$attribute->ID]");
+                $out[] = $field;
+            } else {
+                $out[] = new LiteralField('empty'.$attribute->ID, '');
+            }
+        }
 
 //		if(self::$include_json){ //TODO: this should be included as js validation instead
 //			$vararray = array();
@@ -50,6 +52,6 @@ class GroupedCartFormChildHooks extends DataExtension
 //			$fields->push(new HiddenField('VariationOptions','VariationOptions',json_encode($vararray)));
 //		}
 
-		return new ArrayList($out);
-	}
+        return new ArrayList($out);
+    }
 }
