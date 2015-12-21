@@ -12,11 +12,12 @@
  */
 class RedirectChildProductsExtension extends Extension
 {
-	public function onAfterInit() {
-		$product = $this->owner->data();
-		$parent = $product->Parent();
-		if ($parent && $parent->exists() && $parent instanceof GroupedProduct) {
-			$this->owner->redirect( $parent->Link() );
-		}
-	}
+    public function onAfterInit()
+    {
+        $product = $this->owner->data();
+        $parent = $product->Parent();
+        if ($parent && $parent->exists() && $parent instanceof GroupedProduct) {
+            $this->owner->redirect($parent->Link());
+        }
+    }
 }
